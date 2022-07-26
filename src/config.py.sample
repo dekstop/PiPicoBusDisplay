@@ -1,0 +1,29 @@
+# ============
+# = Settings =
+# ============
+
+LCD_ROWS = 2
+LCD_COLUMNS = 16
+
+WIFI_SSID = 'My wifi SSID'
+WIFI_PWD = 'password123'
+
+USER_AGENT = 'TfL Arrival Display v1 - tfl@dekstop.de'
+
+# TfL allows a maximum of 300 calls per minute per data feed
+UPDATE_WAIT_SECONDS = 60
+
+# TfL Unified API
+# https://api.tfl.gov.uk/swagger/ui/
+
+TFL_APP_KEY = ''
+
+# To get a stop's NaPTAN ID: 
+# 1. Search stops, and extract field "id"
+#    https://api.tfl.gov.uk/StopPoint/Search?query=Charleville
+# 2. Request stop point details, and extract field "naptanIdReference"
+#    https://api.tfl.gov.uk/StopPoint/490G00004998
+NAPTAN_IDS = []
+
+# Optionally, an ordered list of TfL 'lineName' identifiers
+LINE_DISPLAY_ORDER = None
