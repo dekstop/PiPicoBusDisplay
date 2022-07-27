@@ -93,12 +93,13 @@ def format_minutes_seconds(seconds):
         return f"{seconds}s"
 
 def format_minutes(seconds):
-    # minutes = round(seconds / 60) # too generous, might underestimate actual time left
+    # minutes = round(seconds / 60) # too generous, might overestimate actual time left
     minutes = seconds // 60 # more pessimistic estimate of available time
     return f"{minutes}m"
 
-def format_arrival(arrival, max_width):
-    #f"{arrival['lineName']} to {arrival['destinationName']} in {format_seconds(arrival['timeToStation'])}"
+# Returns a string for a single arrival time: <line> <destination> <eta>
+def format_single_arrival(arrival, max_width):
+    #return f"{arrival['lineName']} to {arrival['destinationName']} in {format_minutes_seconds(arrival['timeToStation'])}"
     line = str(arrival['lineName'])
     destination = str(arrival['destinationName'])
     #eta = format_minutes_seconds(arrival['timeToStation'])
@@ -106,15 +107,7 @@ def format_arrival(arrival, max_width):
     max_width = max_width - 2 - len(line) - 1 - len(eta) - 1
     return f"{TFL_ICON_CHAR}{line} {substr(destination, max_width)} {eta}"
 
-def display_arrivals_grid(arrivals, lcd, 
-                          num_arrivals=2, 
-                          num_columns=1,
-                          column_width=16):
-    lcd.clear()
-    for idx, arrival in enumerate(arrivals[:num_arrivals]):
-        lcd.move_to((idx % num_columns) * (column_width + 1), idx // num_columns)
-        lcd.putstr(format_arrival(arrival, column_width))
-
+# Returns a string for multiple arrival times: <line> <eta_1> <eta_2> ...
 def format_arrival_group(line, arrivals, max_width):
     etas = []
     for arrival in arrivals:
@@ -122,6 +115,7 @@ def format_arrival_group(line, arrivals, max_width):
         etas += [format_minutes(arrival['timeToStation'])]
     txt = f"{TFL_ICON_CHAR}{line}"
     
+    # Show as many arrival times as we can fit in the available space
     for eta in etas:
         txt_tmp = f"{txt} {eta}"
         if len(txt_tmp)>max_width:
@@ -129,6 +123,17 @@ def format_arrival_group(line, arrivals, max_width):
         txt = txt_tmp
     return txt
 
+# Show arrival times in a grid, one arrival per grid cell
+def display_arrivals_grid(arrivals, lcd, 
+                          num_arrivals=2, 
+                          num_columns=1,
+                          column_width=16):
+    lcd.clear()
+    for idx, arrival in enumerate(arrivals[:num_arrivals]):
+        lcd.move_to((idx % num_columns) * (column_width + 1), idx // num_columns)
+        lcd.putstr(format_single_arrival(arrival, column_width))
+
+# Show groups of arrival times in a grid, grouped by line
 def display_grouped_arrivals_grid(arrivals, lcd,
                                   lines=None,
                                   num_columns=1,
